@@ -13,19 +13,19 @@ renderTodos = () => {
                 ${element.todo}
               </p>
               <div class="text-center">
-                <a
-                  href="#"
+                <button
+                  id="editBtn"
                   data-id=${element.id}
                   class="btn btn-outline-success text-center"
                   style="width: 150px;"
-                  >Edit</a
+                  >Edit</button
                 >
-                <a
-                  href="#"
+                <button
+                  id="deleteBtn"
                   data-id=${element.id}
                   class="btn btn-outline-danger text-center"
                   style="width: 150px;"
-                  >Delete</a
+                  >Delete</button
                 >
               </div>
             </div>
@@ -41,7 +41,25 @@ postTodo = (tx, cb) => {
     data: { text: tx }
   }).then(res => {
     cb(res);
-    // renderTodos();
+  });
+};
+
+updateTodo = (id, text, cb) => {
+  $.ajax({
+    type: "PATCH",
+    url: "/api",
+    data: { id: id, text: text }
+  }).then(res => {
+    cb(res);
+  });
+};
+
+deleteTodo = (id, cb) => {
+  $.ajax({
+    type: "DELETE",
+    url: `/api/${id}`
+  }).then(res => {
+    cb(res);
   });
 };
 
@@ -52,6 +70,23 @@ $(document).ready(function() {
 $("#submitBtn").on("click", () => {
   const text = $("#inputText").val();
   postTodo(text, () => {
+    renderTodos();
+  });
+});
+
+$(document).on("click", "#editBtn", function() {
+  const id = $(this).attr("data-id");
+  const text = $("#inputText").val();
+
+  updateTodo(id, text, () => {
+    renderTodos();
+  });
+});
+
+$(document).on("click", "#deleteBtn", function() {
+  const id = $(this).attr("data-id");
+
+  deleteTodo(id, () => {
     renderTodos();
   });
 });
